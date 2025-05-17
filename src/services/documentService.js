@@ -24,6 +24,57 @@ const insertDocument = async ({ documentId, s3Key, title, uploadedBy }) => {
   }
 };
 
+/**
+ * List all uploaded documents
+ * @returns {Promise<Array>} - List of documents
+ */
+const listDocuments = async () => {
+  const query = `
+    SELECT id AS documentId, s3_path AS s3Key, title, uploaded_by AS uploadedBy, created_at AS uploadedAt
+    FROM documents
+    ORDER BY created_at DESC
+  `;
+
+  try {
+    const { rows } = await pool.query(query);
+    return rows;
+  } catch (err) {
+    console.error("Error fetching documents:", err.message);
+    throw new Error("Failed to fetch documents");
+  }
+};
+
+/**
+ * Delete a document and its related embeddings
+ * @param {string} documentId - Document ID
+ * @returns {Promise<void>}
+ */
+const deleteDocumentAndEmbeddings = async (documentId) => {
+  try {
+    await pool.query("BEGIN");
+
+    // Delete embeddings
+    const deleteEmbeddingsQuery = `DELETE FROM embeddings WHERE id = $1`;
+    const embeddingsResult = await pool.query(deleteEmbeddingsQuery, [documentId]);
+
+    // Delete document
+    const deleteDocumentQuery = `DELETE FROM documents WHERE id = $1`;
+    const documentResult = await pool.query(deleteDocumentQuery, [documentId]);
+
+    if (embeddingsResult.rowCount === 0 || documentResult.rowCount === 0) {
+      throw new Error("Document not found either in document or embeddings table");
+    }
+
+    await pool.query("COMMIT");
+  } catch (err) {
+    await pool.query("ROLLBACK");
+    console.error("Error deleting document and embeddings:", err.message);
+    throw new Error("Failed to delete document and embeddings");
+  }
+};
+
 module.exports = {
   insertDocument,
+  listDocuments,
+  deleteDocumentAndEmbeddings,
 };

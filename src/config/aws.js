@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { SQSClient } = require('@aws-sdk/client-sqs');
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const { PutObjectCommand } = require('@aws-sdk/client-s3');
 const { SendMessageCommand } = require('@aws-sdk/client-sqs');
@@ -25,6 +25,27 @@ const uploadToS3 = async (fileBuffer, s3Key) => {
 };
 
 /**
+ * Delete a file from S3
+ * @param {string} s3Key - The key of the file to be deleted
+ * @returns {Promise<void>}
+ */
+const deleteFromS3 = async (s3Key) => {
+    const params = {
+        Bucket: process.env.RAW_DATA_BUCKET,
+        Key: s3Key,
+    };
+
+    try {
+        const command = new DeleteObjectCommand(params);
+        await s3.send(command);
+        console.log(`File deleted from S3: ${s3Key}`);
+    } catch (err) {
+        console.error(`Error deleting from S3: ${err.message}`);
+        throw new Error("Failed to delete file from S3");
+    }
+};
+
+/**
  * Utility function to send SQS message
  * @param {Object} message - The SQS message payload
  * @returns {Promise}
@@ -37,4 +58,4 @@ const sendToSQS = async (message) => {
     return sqs.send(new SendMessageCommand(params));
 };
 
-module.exports = { sendToSQS, uploadToS3 };
+module.exports = { sendToSQS, uploadToS3, deleteFromS3 };
