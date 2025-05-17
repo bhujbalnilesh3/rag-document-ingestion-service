@@ -89,4 +89,13 @@ router.post("/register", async (req, res) => {
     }
 });
 
+/**
+ * POST /api/users/logout
+ * Logout the user
+ */
+router.post("/logout", (req, res) => {
+    // Instruct the frountend to delete the token
+    res.status(200).json({ message: "Logout successful, please remove the token on the client side" });
+});
+
 module.exports = router;
