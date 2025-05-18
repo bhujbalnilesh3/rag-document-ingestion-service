@@ -9,12 +9,12 @@ const pool = require('../db/connection');
  * @param {string} doc.uploadedBy - User identifier
  * @returns {Promise}
  */
-const insertDocument = async ({ documentId, s3Key, title, uploadedBy }) => {
+const insertDocument = async ({ documentId, title, uploadedBy }) => {
   const query = `
-    INSERT INTO documents (id, s3_path, title, uploaded_by)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO documents (id, title, uploaded_by)
+    VALUES ($1, $2, $3)
   `;
-  const values = [documentId, s3Key, title, uploadedBy];
+  const values = [documentId, title, uploadedBy];
 
   try {
     await pool.query(query, values);
@@ -30,9 +30,9 @@ const insertDocument = async ({ documentId, s3Key, title, uploadedBy }) => {
  */
 const listDocuments = async () => {
   const query = `
-    SELECT id AS documentId, s3_path, title, uploaded_by, created_at, processed
+    SELECT id AS documentId, title, uploaded_by, created_at, processed
     FROM documents
-    ORDER BY created_at DESC
+    ORDER BY created_at DESC;
   `;
 
   try {
@@ -41,6 +41,27 @@ const listDocuments = async () => {
   } catch (err) {
     console.error("Error fetching documents:", err.message);
     throw new Error("Failed to fetch documents");
+  }
+};
+
+/**
+ * Get document by ID
+ * @param {string} documentId - The ID of the document
+ * @returns {Promise<Object|null>} - Document data or null if not found
+ */
+const getDocumentById = async (documentId) => {
+  const query = `
+    SELECT id AS documentId, title  
+    FROM documents 
+    WHERE id = $1;
+  `;
+
+  try {
+    const { rows } = await pool.query(query, [documentId]);
+    return rows.length ? rows[0] : null;
+  } catch (err) {
+    console.error("Error fetching document by ID:", err.message);
+    throw new Error("Failed to fetch document");
   }
 };
 
@@ -77,4 +98,5 @@ module.exports = {
   insertDocument,
   listDocuments,
   deleteDocumentAndEmbeddings,
+  getDocumentById,
 };
