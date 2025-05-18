@@ -11,15 +11,17 @@ const router = express.Router();
  * Handles file upload, S3 storage, and SQS queueing
  */
 router.post('/upload', authenticateJWT, uploadMiddleware, async (req, res) => {
-  const { title, uploadedBy } = req.body;
+  const { title } = req.body;
   const file = req.file;
 
-  if (!file || !title || !uploadedBy) {
-    return res.status(400).json({ error: 'File, title, and uploadedBy are required' });
+  if (!file || !title) {
+    return res.status(400).json({ error: 'File and title are required' });
   }
 
   const documentId = uuidv4();
   const s3Key = `${documentId}.pdf`;
+
+  const uploadedBy = req.user.username;
 
   try {
     // Upload to S3

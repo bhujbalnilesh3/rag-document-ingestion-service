@@ -30,7 +30,7 @@ const insertDocument = async ({ documentId, s3Key, title, uploadedBy }) => {
  */
 const listDocuments = async () => {
   const query = `
-    SELECT id AS documentId, s3_path AS s3Key, title, uploaded_by AS uploadedBy, created_at AS uploadedAt
+    SELECT id AS documentId, s3_path, title, uploaded_by, created_at, processed
     FROM documents
     ORDER BY created_at DESC
   `;
