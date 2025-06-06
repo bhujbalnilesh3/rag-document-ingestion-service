@@ -115,3 +115,28 @@ curl -X POST http://localhost:3000/api/ingestion/upload \
   "jobId": "123e4567-e89b-12d3-a456-426614174000",
   "sqsMessageId": "abcdef12-3456-7890-abcd-ef1234567890"
 }
+
+## ✅ Query and response from RAG:
+curl --location 'http://localhost:3000/api/rag/query' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer XXXXXXXXXXXXX' \
+--data '{
+    "query": "What is Operating Expenses DeltaCore Solutions.?",
+    "documentsIds": ["1b3f398e-edd3-4dc5-8244-a6ed8c0303fb"]
+}'
+
+## ✅ Expected Response:
+{
+    "query": "What is Operating Expenses DeltaCore Solutions.?",
+    "answer": "The Operating Expenses for DeltaCore Solutions in 2024 are $10,500,000.",
+    "documentsIds": [
+        "1b3f398e-edd3-4dc5-8244-a6ed8c0303fb"
+    ],
+    "matchedChunks": [
+        {
+            "content": "\n\nCompany Name: DeltaCore Solutions \nIndustry: Software Development and Consulting \nBusiness Description: \nDeltaCore Solutions is a software development and consulting firm specializing in custom ERP \nsystems and CRM integrations for mid-sized businesses. Despite an increase in operational costs and \nproject cancellations, the company maintained steady revenue but ended 2024 with a significant net \nloss. \n \nFinancial Overview (2024): \n• Revenue: $22,000,000 \n• Gross Profit: $8,800,000 \n• Net Loss: -$3,600,000 \n• Operating Expenses: $10,500,000 \n• Cost of Goods Sold (COGS): $13,200,000 \n \nAssets: \n• Cash: $2,000,000 \n• Accounts Receivable: $1,600,000 \n• Property and Equipment: $5",
+            "document_id": "1b3f398e-edd3-4dc5-8244-a6ed8c0303fb",
+            "chunk_index": 0
+        }
+    ]
+}
