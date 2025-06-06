@@ -11,6 +11,7 @@ const pool = require('./db/connection');
 // Routes
 const ingestionRoutes = require('./routes/ingestion');
 const authRoutes = require("./routes/user");
+const ragRoutes = require("./routes/rag");
 
 const app = express();
 
@@ -34,6 +35,7 @@ pool.query('SELECT NOW()', (err, res) => {
 // Routes
 app.use('/api/ingestion', ingestionRoutes);
 app.use("/api/users", authRoutes);
+app.use("/api/rag", ragRoutes);
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {

@@ -55,6 +55,18 @@ DB_HOST=db
 DB_PORT=5432
 DB_NAME=documentdb
 
+# JWT Configuration
+JWT_SECRET="<random-alphanumeric-long-text>"
+BCRYPT_SALT_ROUNDS="10"
+JWT_EXPIRATION="1h"
+
+# OpenAI Configuration
+OPENAI_API_KEY="<your info>"
+OPENAI_MAX_RETRIES="3"
+OPENAI_BACKOFF_FACTOR="3"
+EMBEDDING_MODEL="text-embedding-3-small"
+LLM_MODEL="gpt-4o-mini"
+
 ## ✅  Create the database
 CREATE DATABASE documentdb;
 
